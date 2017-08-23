@@ -1,0 +1,52 @@
+#refreshrate {
+	width: auto;
+}
+
+#login {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%,-50%);
+}
+
+#loginpage {
+	background: #ecf0f5;
+}
+
+#nightlevel_slider {
+	width: 100%;
+}
+
+.color-red {
+	color: red;
+}
+
+.bg-whitesmoke {
+	background: #ecf0f5;
+}
+
+.flexbtngroup {
+	display: flex;
+}
+
+.dropdown-menu>.divider {
+	background-color: #eee !important;
+}
+
+.fullwidth {
+	width: 100% !important;
+}
+
+.navbar-custom-menu>.navbar-nav>li>.dropdown-menu>li>a {
+	color: #777 !important;
+}
+
+.slider-selection {
+	background: #BABABA;
+}
+
+@media (max-width: 991px) {
+	.navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
+		right: 0;
+	}
+}

@@ -1,0 +1,40 @@
+{
+	"Version": "2012-10-17",
+	"Statement": [
+	{
+		"Effect": "Allow",
+		"Action": "iot:Connect",
+		"Resource": "*"
+	},
+	{
+		"Effect": "Allow",
+		"Action": "iot:Publish",
+		"Resource": "arn:aws:iot:<region>:<account ID>:topic/room/*"
+	},
+	{
+		"Effect": "Allow",
+		"Action": "iot:Publish",
+		"Resource": "arn:aws:iot:<region>:<account ID>:topic/doorbell"
+	},
+	{
+		"Effect": "Allow",
+		"Action": "iot:Subscribe",
+		"Resource": "arn:aws:iot:<region>:<account ID>:topicfilter/room/*"
+	},
+	{
+		"Effect": "Allow",
+		"Action": "iot:Receive",
+		"Resource": "arn:aws:iot:<region>:<account ID>:topic/room/*/controls/led/*"
+	},
+	{
+		"Effect": "Allow",
+		"Action": "iot:Receive",
+		"Resource": "arn:aws:iot:<region>:<account ID>:topic/room/*/controls/process/*"
+	},
+	{
+		"Effect": "Allow",
+		"Action": "iot:Receive",
+		"Resource": "arn:aws:iot:<region>:<account ID>:topic/room/*/sensors"
+	}
+	]
+}

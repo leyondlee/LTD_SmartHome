@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+	{% include '_header.html' %}
+	
+	<body id="loginpage">
+		<div class="row">
+			<div class="col-md-3 col-xs-12" id="login">
+				<div class="box box-primary">
+					<div class="box-header with-border">
+						<div class="text-center">
+							<h3 class="box-title">Login</h3>
+						</div>
+					</div>
+					<div class="box-body">
+						{% if form.errors %}
+						<div class="alert alert-danger alert-dismissible">
+							<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+							<h4><i class="icon fa fa-warning"></i> Error</h4>
+							{% for field, error in form.errors.items() %}
+							{% for e in error %}
+								{{ e }}<br>
+							{% endfor %}
+							{% endfor %}
+						</div>
+						{% endif %}
+						
+						{% if error %}
+						<div class="alert alert-danger alert-dismissible">
+							<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+							<h4><i class="icon fa fa-warning"></i> Error</h4>
+							{{ error }}
+						</div>
+						{% endif %}
+						
+						<form action="{{ url_for('auth.login') }}" method="post" autocomplete="off" spellcheck="false">
+							{{ form.csrf_token }}
+							
+							<div class="form-group">
+								<div class="input-group">
+									<span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+									{{ form.username(class_="form-control" , placeholder="Username") }}
+								</div>
+							</div>
+							
+							<div class="form-group">
+								<div class="input-group">
+									<span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+									{{ form.password(class_="form-control" , placeholder="Password") }}
+								</div>
+							</div>
+							
+							<div class="checkbox">
+								<label>{{ form.rememberme() }} Remember me</label>
+							</div>
+							
+							<br>
+							
+							<div class="btn-group btn-group-justified">
+								<div class="btn-group">
+									<button type="submit" class="btn btn-primary">Login</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		{% include '_scripts.html' %}
+	</body>
+</html>

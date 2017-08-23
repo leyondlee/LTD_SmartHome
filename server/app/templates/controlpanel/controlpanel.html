@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+	{% include '_header.html' %}
+	
+	<body class="hold-transition skin-blue sidebar-mini">
+		<div class="wrapper">
+			{% include '_navbar.html' %}
+			
+			<div class="content-wrapper">
+				<section class="content-header">
+					<h1><i class="fa fa-desktop" aria-hidden="true"></i> Control Panel</h1>
+				</section>
+				
+				<section class="content">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="box box-primary">
+								<div class="box-header with-border">
+									<h3 class="box-title"><i class="fa fa-camera" aria-hidden="true"></i> Camera</h3>
+									
+									<div class="box-tools pull-right">
+										<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+									</div>
+								</div>
+								<div class="box-body">
+									<div class="col-md-7">
+										<div class="hidden" id="camera_container">
+											<div class="alert alert-danger alert-dismissible hidden" id="camera_error">
+												<h4><i class="icon fa fa-warning"></i> Error</h4>
+												Stream is currently offline.
+											</div>
+											<div class="alert alert-danger alert-dismissible hidden" id="camera_alert">
+												<h4><i class="icon fa fa-warning"></i> Error</h4>
+												You do not have an API Key.
+											</div>
+											
+											<img src="" class="img-thumbnail img-responsive" id="camera_image">
+											
+											<div class="text-center">
+												<br>
+												<button type="button" class="btn btn-default hidden" id="camera_capture_button" onclick="camera_capture(this)"><i class="fa fa-camera"></i> Take Photo</button>
+												<br>
+												<br>
+											</div>
+										</div>
+										<div id="camera_loading">
+											<div class="text-center">
+												<i class="fa fa-circle-o-notch fa-spin"></i> Loading... Please wait
+											</div>
+										</div>
+									</div>
+									<div class="col-md-5">
+										<div class="table-responsive">
+											<table class="table table-bordered table-hover" id="camera_history_table"></table>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					<div class="row">
+						{% for key,value in rooms.iteritems() %}
+						<div class="col-md-12">
+							<div class="box box-primary" id="box_{{ key }}">
+								<div class="box-header with-border">
+									<h3 class="box-title"><i class="fa fa-bed" aria-hidden="true"></i> {{ value.name }}</h3>
+
+									<div class="box-tools pull-right">
+										<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+									</div>
+								</div>
+								<div class="box-body">
+									<div class="alert alert-danger error hidden">
+										<h4><i class="icon fa fa-warning"></i> Error</h4>
+										Something went wrong.
+									</div>
+									<div class="controls_container">
+										<div class="col-md-6">
+											<div class="box box-solid box-default">
+												<div class="box-header with-border">
+													<h3 class="box-title"><i class="fa fa-lightbulb-o" aria-hidden="true"></i> LED Control</h3>
+												</div>
+												
+												<div class="box-body"></div>
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="box box-solid box-default">
+												<div class="box-header with-border">
+													<h3 class="box-title"><i class="fa fa-tasks" aria-hidden="true"></i> Processes</h3>
+												</div>
+												
+												<div class="box-body">
+													<br>
+													<div class="row">
+														<div class="col-md-4 col-md-offset-1">
+															<img class="img-responsive" src="{{ url_for('static', filename='images/dht11.png') }}">
+														</div>
+														<div class="col-md-6 col-md-offset-1">
+															<br>
+															<div class="form-group">
+																<label class="control-label" for="dht11_monitor">Temperature/Humidity Monitor:</label>
+																<br>
+																<input type="checkbox" class="form-control dht11_monitor" data-toggle="toggle" data-on="Running" data-off="Stopped" data-onstyle="success" data-offstyle="danger" id="dht11_monitor">
+															</div>
+														</div>
+													</div>
+													<br>
+													<hr>
+													<br>
+													<div class="row">
+														<div class="col-md-4 col-md-offset-1">
+															<img class="img-responsive" src="{{ url_for('static', filename='images/ldr.png') }}">
+														</div>
+														<div class="col-md-6 col-md-offset-1">
+															<br>
+															<div class="form-group">
+																<label for="ldr_monitor">Light Monitor:</label>
+																<br>
+																<input type="checkbox" class="form-control ldr_monitor" data-toggle="toggle" data-on="Running" data-off="Stopped" data-onstyle="success" data-offstyle="danger" id="ldr_monitor">
+															</div>
+														</div>
+													</div>
+													<br>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="overlay">
+									<i class="fa fa-refresh fa-spin"></i>
+								</div>
+							</div>
+						</div>
+						{% endfor %}
+					</div>
+				</section>
+			</div>
+		</div>
+		
+		<div class="modal fade" id="camera_modal" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title"><i class="fa fa-picture-o"></i> Image (ID: <span id="camera_modal_id"></span>)</h4>
+					</div>
+					<div class="modal-body">
+						<div class="text-center" id="camera_modal_loading">
+							<i class="fa fa-circle-o-notch fa-spin"></i> Loading... Please wait
+						</div>
+						
+						<div class="hidden" id="camera_modal_container">
+							<div>
+								<img src="" class="img-thumbnail img-responsive" id="camera_modal_image">
+							</div>
+							<br>
+							<div>
+								<strong>Datetime:</strong><br>
+								<span id="camera_modal_datetime"></span>
+							</div>
+							<hr>
+							<div>
+								<strong>Results:</strong>
+								<div>
+									<button type="button" class="btn btn-default hidden" id="camera_modal_visualrecognition"><span id="camera_modal_visualrecognition_loading"><i class="fa fa-circle-o-notch fa-spin"></i></span> Visual Recognition</button>
+									<div class="table-responsive">
+										<table class="table table-bordered table-hover hidden" id="camera_modal_table"></table>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		{% include '_modalconfirm.html' %}
+		
+		{% include '_scripts.html' %}
+		
+		<script id="led_template" type="text/x-handlebars-template">
+			{% raw %}
+			<div class="box box-solid box-primary">
+				<div class="box-header with-border">
+					<strong>LED (PIN: {{ pin }})</strong>
+				</div>
+				<div class="box-body">
+					<div class="col-md-4">
+						<img class="img-responsive" src="{{image}}">
+						<br>
+						<div class="text-center">
+							<input type="checkbox" data-toggle="toggle" id="led_mode" data-size="small" data-led-pin="{{ pin }}" data-led-room="{{ room }}" data-on="Auto" data-off="Manual" data-onstyle="success" data-offstyle="danger">
+						</div>
+					</div>
+					<div class="col-md-7 col-md-offset-1">
+						<div class="form-group">
+							<label for="led_button">Switch:</label>
+							<br>
+							<input type="checkbox" class="form-control" data-toggle="toggle" id="led_button" data-size="small" data-led-pin="{{ pin }}" data-led-room="{{ room }}">
+						</div>
+						<br>
+						<div class="form-group">
+							<label for="led_slider">Value:</label>
+							<input type="text" class="form-control" id="led_slider" data-provide="slider" data-slider-min="0" data-slider-max="1" data-slider-step="0.01" data-slider-value="0" data-led-pin="{{ pin }}" data-led-room="{{ room }}">
+						</div>
+					</div>
+				</div>
+			</div>
+			{% endraw %}
+		</script>
+		
+		<script>
+			var camera_image;
+			var camera_alert;
+			var camera_error;
+			var camera_history_table;
+			
+			var camera_container;
+			var camera_loading;
+			var camera_modal;
+			var camera_modal_loading;
+			var camera_modal_container;
+			var camera_modal_id;
+			var camera_modal_datetime;
+			var camera_modal_image;
+			var camera_modal_visualrecognition;
+			var camera_modal_visualrecognition_loading;
+			var camera_modal_table;
+			
+			function camera_modal_open() {
+				camera_modal.removeAttr('data-imageid');
+				
+				camera_modal_container.addClass('hidden');
+				camera_modal_loading.removeClass('hidden');
+				
+				camera_modal_id.html('<i class="fa fa-circle-o-notch fa-spin"></i>');
+				camera_modal_datetime.text('');
+				camera_modal_image.attr('src','');
+				
+				camera_modal_visualrecognition.off('click');
+				camera_modal_visualrecognition.addClass('hidden');
+				camera_modal_visualrecognition.prop('disabled',false);
+				camera_modal_visualrecognition_loading.addClass('hidden');
+				
+				camera_modal_table.addClass('hidden');
+				camera_modal_table.bootstrapTable('destroy', true);
+				
+				camera_modal.modal();
+				
+				initModalScroll(camera_modal);
+			}
+			
+			function camera_capture(e) {
+				camera_modal_open();
+				
+				$.getJSON('{{ url_for("controlpanel.camera_capture") }}', function(result) {
+					var id = result.ID;
+					camera_modal_show(id);
+					
+					camera_history_table.bootstrapTable('refresh',{silent: true});
+				});
+			}
+			
+			function camera_visualrecognition(id) {
+				camera_modal_visualrecognition_loading.removeClass('hidden');
+				camera_modal_visualrecognition.prop('disabled',true);
+				
+				var url = '{{ url_for("controlpanel.camera_image") }}/' + id + '/visualrecognition';
+				$.getJSON(url, function(result) {
+					camera_modal_getresults(id);
+				});
+			}
+			
+			function camera_modal_getresults(id) {
+				var url = '{{ url_for("controlpanel.camera_image") }}/' + id + '/details';
+				$.getJSON(url, function(result) {
+					var id = result.ID;
+					if (camera_modal.attr('data-imageid') == id) {
+						var timestamp = result.Timestamp;
+						var results = result.Results;
+						
+						camera_modal_id.text(id);
+						camera_modal_datetime.text(formatDate(utcTimestampToDate(timestamp)));
+						
+						if (results) {
+							results = JSON.parse(results);
+							
+							var arr = [];
+							for (i = 0; i < results.length; i++) {
+								var o = results[i];
+								var cls = o['class'];
+								var score = Math.round(o['score'] * 100 * 100) / 100;
+								score = score + '%';
+								
+								arr.push({
+									'1': cls,
+									'2': score
+								});
+							}
+							
+							camera_modal_table.bootstrapTable({
+								search: true,
+								pagination: true,
+								columns: [{
+									field: '1',
+									title: 'Class',
+									sortable: true,
+									width: '100%'
+								}, {
+									field: '2',
+									title: 'Score',
+									sortable: true
+								}],
+								data: arr
+							});
+							
+							camera_modal_visualrecognition.addClass('hidden');
+							camera_modal_table.removeClass('hidden');
+						} else {
+							camera_modal_visualrecognition.click(function() {
+								var id = camera_modal.attr('data-imageid');
+								camera_visualrecognition(id);
+							});
+							
+							camera_modal_visualrecognition.removeClass('hidden');
+						}
+						
+						camera_modal_loading.addClass('hidden');
+						camera_modal_container.removeClass('hidden');
+					}
+				});
+			}
+			
+			function camera_modal_show(id) {
+				if (!camera_modal.is(':visible')) {
+					camera_modal_open();
+				}
+				
+				camera_modal.attr('data-imageid',id);
+				
+				var imageurl = '{{ url_for("controlpanel.camera_image") }}/' + id;
+				camera_modal_image.attr('src',imageurl);
+				
+				camera_modal_getresults(id);
+			}
+			
+			function loadStream() {
+				$.getJSON("{{ url_for('auth.apikey') }}", function(result) {
+					var apikey = result.apikey;
+					if (apikey) {
+						var url = '{{ stream_address }}?apikey=' + apikey;
+						camera_image.attr('src',url);
+						camera_capture_button.removeClass('hidden');
+					} else {
+						camera_image.attr('src','');
+						camera_image.addClass('hidden');
+						camera_alert.removeClass('hidden');
+					}
+				});
+			}
+			
+			$(document).ready(function() {
+				camera_image = $('#camera_image');
+				camera_capture_button = $('#camera_capture_button');
+				camera_alert = $('#camera_alert');
+				camera_error = $('#camera_error');
+				camera_history_table = $('#camera_history_table');
+				
+				camera_container = $('#camera_container');
+				camera_loading = $('#camera_loading');
+				camera_modal = $('#camera_modal');
+				camera_modal_loading = $('#camera_modal_loading');
+				camera_modal_container = $('#camera_modal_container');
+				camera_modal_id = $('#camera_modal_id');
+				camera_modal_datetime = $('#camera_modal_datetime');
+				camera_modal_image = $('#camera_modal_image');
+				camera_modal_visualrecognition = $('#camera_modal_visualrecognition');
+				camera_modal_visualrecognition_loading = $('#camera_modal_visualrecognition_loading');
+				camera_modal_table = $('#camera_modal_table');
+				
+				$.getJSON("{{ url_for('controlpanel.streamstatus') }}", function(result) {
+					var status = result.Status;
+					
+					if (status) {
+						loadStream();
+					} else {
+						camera_error.removeClass('hidden');
+						camera_image.addClass('hidden');
+						camera_capture_button.addClass('hidden');
+					}
+					
+					camera_container.removeClass('hidden');
+					camera_loading.addClass('hidden');
+				});
+				
+				camera_history_table.bootstrapTable('destroy', true);
+				
+				camera_history_table.bootstrapTable({
+					url: '{{ url_for('controlpanel.camera_history') }}',
+					showRefresh: true,
+					search: true,
+					pagination: true,
+					pageSize: 5,
+					responseHandler: function(res) {
+						var arr = [];
+						
+						for (i = 0; i < res.length; i++) {
+							var r = res[i];
+							var id = r.ID;
+							var timestamp = r.Timestamp;
+							
+							var deleteurl = '{{ url_for("controlpanel.delete_image") }}/' + id
+							var delete_button = '<button type="button" class="btn btn-link btn-sm color-red" data-confirm-id="' + id + '" data-confirm-name="Image" data-confirm-table="camera_history_table" data-confirm-url="' + deleteurl + '" onclick="showConfirmModal(this,true)"><span class="glyphicon glyphicon-remove-circle"></span></button>';
+							
+							var results = '<button type="button" class="btn btn-default btn-sm" onclick="camera_modal_show(' + id + ')">View</button>';
+							
+							var url = "{{ url_for('controlpanel.camera_image') }}/" + id;
+							var image = '<a href="' + url + '" data-fancybox><img src="' + url + '" class="img-thumbnail img-responsive"></a>';
+							
+							var datetime = formatDate(utcTimestampToDate(timestamp));
+							
+							d = {
+								'1': delete_button,
+								'2': image,
+								'3': datetime,
+								'4': results
+							}
+							
+							arr.push(d);
+						}
+						
+						return arr;
+					},
+					columns: [{
+						field: '1',
+						title: '<i class="fa fa-trash-o" aria-hidden="true"></i>',
+						align: 'center'
+					}, {
+						field: '2',
+						title: 'Image',
+						width: '30%'
+					}, {
+						field: '3',
+						title: 'Datetime',
+						sortable: true,
+						width: '70%'
+					}, {
+						field: '4',
+						title: 'Results',
+						align: 'center'
+					}]
+				});
+			});
+		</script>
+		
+		<script>
+			var rooms = [];
+			var socket;
+			var socketid;
+			
+			function setupRoom(room) {
+				var box = $('#box_' + room);
+				var box_overlay = box.find('.overlay');
+				var error_alert = box.find('.error');
+				var controls_container = box.find('.controls_container');
+				var led_body = controls_container.find('.box-body').eq(0);
+				var dht11_monitor = box.find('.dht11_monitor');
+				var ldr_monitor = box.find('.ldr_monitor');
+				
+				dht11_monitor.off('change');
+				dht11_monitor.change(function() {
+					if ($(this).attr('data-loaded')) {
+						$(this).attr('data-changing',true);
+						
+						var url = '{{ url_for("controlpanel.room") }}/' + room + '/process/dht11/set/';
+						
+						if ($(this).prop("checked")) {
+							url = url + 'ON';
+						} else {
+							url = url + 'OFF';
+						}
+						
+						$.ajax({url: url});
+						
+						$(this).removeAttr('data-changing');
+					}
+				});
+				
+				ldr_monitor.off('change');
+				ldr_monitor.change(function() {
+					if ($(this).attr('data-loaded')) {
+						$(this).attr('data-changing',true);
+						
+						var url = '{{ url_for("controlpanel.room") }}/' + room + '/process/ldr/set/';
+						
+						if ($(this).prop("checked")) {
+							url = url + 'ON';
+						} else {
+							url = url + 'OFF';
+						}
+						
+						$.ajax({url: url});
+						
+						$(this).removeAttr('data-changing');
+					}
+				});
+				
+				socket.on(room, function(msg) {
+					var timestamp = msg.Timestamp;
+					var LEDs = msg.LEDs;
+					var dht11_monitor_value = msg.DHT11_Monitor;
+					var ldr_monitor_value = msg.LDR_Monitor;
+					
+					if (!dht11_monitor.attr('data-changing')) {
+						dht11_monitor.removeAttr('data-loaded');
+						
+						if (dht11_monitor_value == null) {
+							dht11_monitor.bootstrapToggle('disable');
+						} else {
+							if (dht11_monitor_value) {
+								dht11_monitor.bootstrapToggle('on');
+							} else {
+								dht11_monitor.bootstrapToggle('off');
+							}
+						}
+						
+						dht11_monitor.attr('data-loaded',true);
+					}
+					
+					if (!ldr_monitor.attr('data-changing')) {
+						ldr_monitor.removeAttr('data-loaded');
+						
+						if (ldr_monitor_value == null) {
+							ldr_monitor.bootstrapToggle('disable');
+						} else {
+							if (ldr_monitor_value) {
+								ldr_monitor.bootstrapToggle('on');
+							} else {
+								ldr_monitor.bootstrapToggle('off');
+							}
+						}
+						
+						ldr_monitor.attr('data-loaded',true);
+					}
+					
+					for (var key in LEDs) {
+						var value = LEDs[key]['Value'];
+						var overwrite = LEDs[key]['Overwrite'];
+						
+						var arr = led_body.find('[data-led-pin="' + key + '"]');
+						var led_mode;
+						var led_button;
+						var led_slider;
+						
+						if (arr.length == 0) {
+							var source = $('#led_template').html();
+							var template = Handlebars.compile(source);
+							var context = {
+								'pin': key,
+								'room': room,
+								'image': '{{ url_for("static", filename="images/led.png") }}'
+							};
+							
+							var html = template(context);
+							
+							led_body.append(html);
+							
+							arr = led_body.find('[data-led-pin="' + key + '"]');
+							led_mode = arr.eq(0);
+							led_button = arr.eq(1);
+							led_slider = arr.eq(2);
+							
+							led_mode.bootstrapToggle();
+							led_button.bootstrapToggle();
+							led_slider.slider();
+							
+							led_mode.off('change');
+							led_mode.change(function() {
+								if ($(this).attr('data-loaded')) {
+									$(this).attr('data-changing',true);
+									
+									var pin = $(this).attr('data-led-pin');
+									var room = $(this).attr('data-led-room');
+									
+									var box = $('#box_' + room);
+									
+									var arr = box.find('[data-led-pin="' + pin + '"]');
+									var led_button = arr.eq(1);
+									
+									if (!led_button.attr('data-changing')) {
+										var url = '{{ url_for("controlpanel.room") }}/' + room + '/led/' + pin + '/set/mode/';
+										
+										if ($(this).prop('checked')) {
+											$.ajax({url: (url + '0')});
+										} else {
+											$.ajax({url: (url + '1')});
+										}
+									}
+									
+									$(this).removeAttr('data-changing');
+								}
+							});
+							
+							led_button.off('change');
+							led_button.change(function() {
+								if ($(this).attr('data-loaded')) {
+									$(this).attr('data-changing',true);
+									
+									var pin = $(this).attr('data-led-pin');
+									var room = $(this).attr('data-led-room');
+									
+									var box = $('#box_' + room);
+									
+									var arr = box.find('[data-led-pin="' + pin + '"]');
+									var led_mode = arr.eq(0);
+									var led_slider = arr.eq(2);
+									
+									if (!led_slider.attr('data-changing')) {
+										led_mode.removeAttr('data-loaded');
+										led_mode.attr('data-changing',true);
+										led_mode.bootstrapToggle('off');
+										led_mode.attr('data-loaded',true);
+										led_mode.removeAttr('data-changing');
+										
+										var url = '{{ url_for("controlpanel.room") }}/' + room + '/led/' + pin + '/set/';
+										
+										if ($(this).prop('checked')) {
+											$.ajax({url: (url + '1')});
+											led_slider.slider('setValue',1);
+										} else {
+											$.ajax({url: (url + '0')});
+											led_slider.slider('setValue',0);
+										}
+									}
+									
+									$(this).removeAttr('data-changing');
+								}
+							});
+							
+							led_slider.slider('off','slideStart');
+							led_slider.on('slideStart', function() {
+								$(this).attr('data-changing',true);
+							});
+							
+							led_slider.slider('off','slideStop');
+							led_slider.on("slideStop", function() {
+								if ($(this).attr('data-loaded')) {
+									var pin = $(this).attr('data-led-pin');
+									var room = $(this).attr('data-led-room');
+									
+									var box = $('#box_' + room);
+									
+									var arr = box.find('[data-led-pin="' + pin + '"]');
+									var led_mode = arr.eq(0);
+									var led_button = arr.eq(1);
+									
+									var value = $(this).val();
+									
+									var url = '{{ url_for("controlpanel.room") }}/' + room + '/led/' + pin + '/set/' + value;
+									
+									led_mode.removeAttr('data-loaded');
+									led_mode.attr('data-changing',true);
+									led_mode.bootstrapToggle('off');
+									led_mode.attr('data-loaded',true);
+									led_mode.removeAttr('data-changing');
+									
+									if (value > 0) {
+										led_button.bootstrapToggle('on');
+									} else {
+										led_button.bootstrapToggle('off');
+									}
+									
+									$.ajax({url: url});
+									
+									$(this).removeAttr('data-changing');
+								}
+							});
+						} else {
+							led_mode = arr.eq(0);
+							led_button = arr.eq(1);
+							led_slider = arr.eq(2);
+						}
+						
+						if (!led_mode.attr('data-changing')) {
+							led_mode.removeAttr('data-loaded');
+							
+							if (overwrite) {
+								led_mode.bootstrapToggle('off');
+							} else {
+								led_mode.bootstrapToggle('on');
+							}
+							
+							led_mode.attr('data-loaded',true);
+						}
+						
+						if (!led_button.attr('data-changing')) {
+							led_button.removeAttr('data-loaded');
+							
+							if (value > 0) {
+								led_button.bootstrapToggle('on');
+							} else {
+								led_button.bootstrapToggle('off');
+							}
+							
+							led_button.attr('data-loaded',true);
+						}
+						
+						if (!led_slider.attr('data-changing')) {
+							led_slider.removeAttr('data-loaded');
+							
+							led_slider.slider('setValue',value);
+							
+							led_slider.attr('data-loaded',true);
+						}
+					}
+					
+					led_body.slimScroll();
+					
+					box_overlay.addClass('hidden');
+				});
+			}
+			
+			$(document).ready(function() {
+				$('.controls_container').each(function(i,obj) {
+					var arr = $(obj).find('.box-body');
+					var ledbox_body = arr.eq(0);
+					var processesbox_body = arr.eq(1);
+					var processesbox_body_height = processesbox_body.height();
+					
+					ledbox_body.slimScroll({
+						height: processesbox_body_height
+					});
+					
+					var ledbox_body_height = ledbox_body.height();
+					var diff = processesbox_body_height - ledbox_body_height;
+					
+					ledbox_body.slimScroll({
+						destroy: true
+					});
+					
+					ledbox_body.slimScroll({
+						height: (processesbox_body_height + diff)
+					});
+				});
+				
+				socket = socketConnect();
+				
+				{% for key,value in rooms.iteritems() %}
+				rooms.push('{{ key }}');
+				{% endfor %}
+				
+				for (i = 0; i < rooms.length; i++) {
+					var room = rooms[i];
+					setupRoom(room);
+				}
+				
+				socket.on('connect', () => {
+					socket.emit('join', {room: 'controls'});
+					socketid = socket.io.engine.id;
+					
+					for (i = 0; i < rooms.length; i++) {
+						var room = rooms[i];
+						$.ajax({url: '{{ url_for("controlpanel.roomemit") }}/' + room + '/' + socketid});
+					}
+				});
+			});
+		</script>
+	</body>
+</html>

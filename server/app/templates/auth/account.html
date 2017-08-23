@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+	{% include '_header.html' %}
+	
+	<body class="hold-transition skin-blue sidebar-mini">
+		<div class="wrapper">
+			{% include '_navbar.html' %}
+			
+			<div class="content-wrapper">
+				<section class="content-header">
+					<h1><i class="fa fa-user" aria-hidden="true"></i> Account</h1>
+				</section>
+				
+				<section class="content">
+					{% if success %}
+					<div class="row">
+						<div class="col-md-12">
+							<div class="alert alert-success alert-dismissible">
+								<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+								<h4><i class="icon fa fa-check"></i> Success</h4>
+								{{ success }}
+							</div>
+						</div>
+					</div>
+					{% endif %}
+					
+					<div class="row">
+						<div class="col-md-6">
+							<div class="box box-primary">
+								<div class="box-header with-border">
+									<h3 class="box-title"><i class="fa fa-edit" aria-hidden="true"></i> Change Password</h3>
+									
+									<div class="box-tools pull-right">
+										<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+									</div>
+								</div>
+								<div class="box-body">
+									{% if form.errors %}
+									<div>
+										<div class="alert alert-danger alert-dismissible">
+											<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+											<h4><i class="icon fa fa-warning"></i> Error</h4>
+											{% for field, error in form.errors.items() %}
+											{% for e in error %}
+												{{ e }}<br>
+											{% endfor %}
+											{% endfor %}
+										</div>
+									</div>
+									{% endif %}
+									
+									{% if error %}
+									<div class="alert alert-danger alert-dismissible">
+										<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+										<h4><i class="icon fa fa-warning"></i> Error</h4>
+										{{ error }}
+									</div>
+									{% endif %}
+									
+									<form action="{{ url_for('auth.account') }}" method="post" class="form-horizontal" id="changepasswordform" autocomplete="off" spellcheck="false">
+										{{ form.csrf_token }}
+										
+										<div class="form-group">
+											<label for="{{ form.currentpassword.id }}" class="col-sm-4 control-label">{{ form.currentpassword.label }}:</label>
+
+											<div class="col-sm-7">
+												{{ form.currentpassword(class_="form-control" , placeholder="Current Password") }}
+											</div>
+										</div>
+										
+										<div class="form-group">
+											<label for="{{ form.newpassword.id }}" class="col-sm-4 control-label">{{ form.newpassword.label }}:</label>
+
+											<div class="col-sm-7">
+												{{ form.newpassword(class_="form-control" , placeholder="New Password") }}
+											</div>
+										</div>
+										
+										<div class="form-group">
+											<label for="{{ form.confirmpassword.id }}" class="col-sm-4 control-label">{{ form.confirmpassword.label }}:</label>
+
+											<div class="col-sm-7">
+												{{ form.confirmpassword(class_="form-control" , placeholder="Confirm Password") }}
+											</div>
+										</div>
+									</form>
+								</div>
+								<div class="box-footer">
+									<div class="text-center">
+										<button type="submit" class="btn btn-default" form="changepasswordform">Submit</button>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+						<div class="col-md-6">
+							<div class="box box-primary">
+								<div class="box-header with-border">
+									<h3 class="box-title"><i class="fa fa-key" aria-hidden="true"></i> API Key</h3>
+									
+									<div class="box-tools pull-right">
+										<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+									</div>
+								</div>
+								<div class="box-body">
+									<div class="alert alert-info alert-dismissible">
+										<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+										<h4><i class="icon fa fa-info"></i> Info</h4>
+										Your API Key is unique and should not be shared.
+									</div>
+									
+									<div class="form-horizontal">
+										<div class="form-group">
+											<label for="apikey" class="col-sm-3 control-label">API Key:</label>
+
+											<div class="col-sm-8">
+												<div class="input-group">
+													{% if apikey %}
+													<input type="text" class="form-control input-sm" id="apikey" value="{{ apikey }}" readonly>
+													<span class="input-group-btn">
+														<div class = "btn-group flexbtngroup">
+															<button class="btn btn-default btn-sm" type="button" onclick="location.href ='{{ url_for('auth.deleteapikey') }}'"><i class="fa fa-times" aria-hidden="true"></i></button>
+															<button class="btn btn-default btn-sm" type="button" data-clipboard-action="copy" data-clipboard-target="#apikey"><i class="fa fa-files-o" aria-hidden="true"></i></button>
+														</div>
+													</span>
+													{% else %}
+													<input type="text" class="form-control input-sm" id="apikey" value="-" disabled>
+													<span class="input-group-btn">
+														<div class = "btn-group flexbtngroup">
+															<button class="btn btn-default btn-sm" type="button" disabled><i class="fa fa-times" aria-hidden="true"></i></button>
+															<button class="btn btn-default btn-sm" type="button" disabled><i class="fa fa-files-o" aria-hidden="true"></i></button>
+														</div>
+													</span>
+													{% endif %}
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="box-footer">
+									<div class="text-center">
+										<a href="{{ url_for('auth.generateapikey') }}"><button class="btn btn-default">Generate API Key</button></a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+			</div>
+		</div>
+		
+		{% include '_scripts.html' %}
+		
+		<script>
+			var clipboard = new Clipboard('.btn');
+		</script>
+	</body>
+</html>

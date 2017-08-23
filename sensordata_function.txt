@@ -1,0 +1,44 @@
+var AWS = require('aws-sdk');
+
+AWS.config.update({
+    region: 'ap-southeast-1'
+});
+
+var docClient = new AWS.DynamoDB.DocumentClient();
+
+exports.handler = (event, context, callback) => {
+    var room = event.Room;
+    var timestamp = event.Timestamp;
+    var dht11 = event.DHT11;
+    var ldr = event.LDR;
+    
+    var humidity = dht11.Humidity;
+    var temperature = dht11.Temperature;
+    var light = ldr.Value;
+    
+    docClient.get({
+        TableName: 'Subscription',
+        Key: {
+            'Topic': room
+        }
+    }, function(err, data) {
+        if (!err) {
+            if ('Item' in data) {
+                if (light) {
+                    light = Math.round((1024 / light) % 1024);
+                }
+                
+                docClient.put({
+                    TableName: 'Sensor',
+                    Item: {
+                        'Room': room,
+                        'Timestamp': timestamp,
+                        'Humidity': humidity,
+                        'Temperature': temperature,
+                        'Light': light
+                    }
+                }, function(err, data) {});
+            }
+        }
+    });
+};

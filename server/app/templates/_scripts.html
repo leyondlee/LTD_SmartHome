@@ -1,0 +1,142 @@
+<script type="text/javascript" src="{{ url_for('static', filename='js/loader.js') }}"></script>
+
+<!-- jQuery 3 -->
+<script src="{{ url_for('static', filename='js/jquery-3.2.1.min.js') }}"></script>
+
+<!-- Bootstrap 3.3.7 -->
+<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+
+<!-- FastClick -->
+<script src="{{ url_for('static', filename='js/fastclick.js') }}"></script>
+
+<!-- AdminLTE App -->
+<script src="{{ url_for('static', filename='dist/js/adminlte.min.js') }}"></script>
+
+<!-- SlimScroll -->
+<script src="{{ url_for('static', filename='js/jquery.slimscroll.min.js') }}"></script>
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap-table.min.js') }}"></script>
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/js.cookie-2.1.4.min.js') }}"></script>
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap-toggle.min.js') }}"></script>
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap-slider.min.js') }}"></script>
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/clipboard.min.js') }}"></script>
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/handlebars-v4.0.10.js') }}"></script>
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.fancybox.min.js') }}"></script>
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/socket.io.js') }}"></script>
+
+<script>
+	$(document).ready(function(){
+		var currentPage = window.location.pathname;
+		$("#navbar ul li a[href='" + currentPage + "']").parent().addClass("active");
+		
+		$('[data-toggle="tooltip"]').tooltip({
+			container: 'body'
+		});
+	});
+</script>
+
+<script>
+	function clearCookies() {
+		Cookies.remove('refreshrate');
+		Cookies.remove('zoom');
+		
+		alert('Cookies cleared');
+		location.reload();
+	}
+	
+	function initModalScroll(modal) {
+        var body = modal.find('.modal-body');
+        var height = $(window).height() * 0.7;
+
+        body.slimscroll({
+            destroy: true
+        });
+
+        body.slimscroll({
+            height: height
+        });
+    }
+	
+	function formatDate(date) {
+		var day = date.getDate();
+		var month = date.getMonth() + 1;
+		var year = date.getFullYear();
+		
+		var seconds = date.getSeconds();
+		var minutes = date.getMinutes();
+		var hour = date.getHours();
+		
+		var formatted = ('0' + day).slice(-2) + '-' + ('0' + month).slice(-2) + '-' + ('' + year).slice(-2) + ' ' + ('0' + hour).slice(-2) + ':' + ('0' + minutes).slice(-2) + ':' + ('0' + seconds).slice(-2);
+		return formatted;
+	}
+	
+	function utcTimestampToDate(timestamp) {
+		var date = new Date(0);
+		date.setUTCSeconds(timestamp);
+		
+		return date;
+	}
+	
+	function showConfirmModal(e,ajax) {
+		e = $(e);
+		
+		var id = e.attr('data-confirm-id');
+		var name = e.attr('data-confirm-name');
+		var url = e.attr('data-confirm-url');
+		var table = e.attr('data-confirm-table');
+		
+        var confirm_modal = $('#confirm_modal');
+        var confirm_modal_id = $('#confirm_modal_id');
+        var confirm_modal_name = $('#confirm_modal_name');
+        var confirm_modal_submit = $('#confirm_modal_submit');
+		var confirm_modal_buttons = confirm_modal.find('.modal-footer .btn');
+		
+		confirm_modal_submit.off('click');
+
+        confirm_modal_id.html(id);
+        confirm_modal_name.html(name);
+		
+		confirm_modal_submit.click(function () {
+			confirm_modal_buttons.prop('disabled',true);
+			
+			if (ajax) {
+				$.ajax({
+					url: url,
+					success: function(result) {
+						confirm_modal.modal('hide');
+						$('#' + table).bootstrapTable('refresh',{silent: true});
+					},
+					complete: function() {
+						confirm_modal_buttons.prop('disabled',false);
+					}
+				});
+			} else {
+				window.location.replace(url);
+			}
+		});
+		
+        confirm_modal.modal();
+    }
+	
+	function isArrayInArray(arr, item){
+		var item_as_string = JSON.stringify(item);
+
+		var contains = arr.some(function(e){
+			return JSON.stringify(e) === item_as_string;
+		});
+
+		return contains;
+    }
+	
+	function socketConnect() {
+		socket = io.connect('wss://' + document.domain + ':' + location.port);
+		return socket;
+	}
+</script>

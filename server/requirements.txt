@@ -1,0 +1,11 @@
+gevent
+flask
+flask-sqlalchemy
+flask-wtf
+flask-login
+watson_developer_cloud
+MySQL-python
+AWSIoTPythonSDK
+boto3
+python-dateutil
+flask-socketio

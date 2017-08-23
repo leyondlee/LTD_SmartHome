@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+	{% include '_header.html' %}
+	
+	<body class="hold-transition skin-blue sidebar-mini">
+		<div class="wrapper">
+			{% include '_navbar.html' %}
+			
+			<div class="content-wrapper">
+				<section class="content-header">
+					<h1><i class="fa fa-cog" aria-hidden="true"></i> Configuration</h1>
+				</section>
+				
+				<section class="content">
+					{% if success %}
+					<div class="row">
+						<div class="col-md-12">
+							<div class="alert alert-success alert-dismissible">
+								<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+								<h4><i class="icon fa fa-check"></i> Success</h4>
+								{{ success }}
+							</div>
+						</div>
+					</div>
+					{% endif %}
+					
+					{% if error %}
+					<div class="alert alert-danger alert-dismissible">
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+						<h4><i class="icon fa fa-warning"></i> Error</h4>
+						{{ error }}
+					</div>
+					{% endif %}
+					
+					{% if form.errors %}
+					<div>
+						<div class="alert alert-danger alert-dismissible">
+							<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+							<h4><i class="icon fa fa-warning"></i> Error</h4>
+							{% for field, error in form.errors.items() %}
+							{% for e in error %}
+								{{ e }}<br>
+							{% endfor %}
+							{% endfor %}
+						</div>
+					</div>
+					{% endif %}
+					
+					<div class="row">
+						<div class="col-md-8">
+							<div class="box box-primary">
+								<div class="box-header with-border">
+									<h3 class="box-title"><i class="fa fa-bed" aria-hidden="true"></i> Rooms</h3>
+
+									<div class="box-tools pull-right">
+										<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+									</div>
+								</div>
+								<div class="box-body">
+									<div class="table-responsive">
+										<table class="table table-bordered table-hover" id="rooms_table"></table>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+						<div class="col-md-4 pull-right">
+							<div class="box box-primary">
+								<div class="box-header with-border">
+									<h3 class="box-title"><i class="fa fa-plus-circle" aria-hidden="true"></i> Add Room</h3>
+
+									<div class="box-tools pull-right">
+										<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+									</div>
+								</div>
+								<div class="box-body">
+									<form action="{{ url_for('settings.configuration') }}add" method="post" class="form-horizontal" id="addroomform" autocomplete="off" spellcheck="false">
+										{{ form.csrf_token }}
+										
+										<div class="form-group">
+											<label for="{{ form.topic.id }}" class="col-sm-4 control-label">{{ form.topic.label }}:</label>
+
+											<div class="col-sm-7">
+												{{ form.topic(class_="form-control" , placeholder="Topic", value="") }}
+											</div>
+										</div>
+										
+										<div class="form-group">
+											<label for="{{ form.displayname.id }}" class="col-sm-4 control-label">{{ form.displayname.label }}:</label>
+
+											<div class="col-sm-7">
+												{{ form.displayname(class_="form-control" , placeholder="Display Name", value="") }}
+											</div>
+										</div>
+										
+										<hr>
+										
+										<div class="form-group">
+											<label for="{{ form.nightlevel.id }}" class="col-sm-4 control-label">{{ form.nightlevel.label }}:</label>
+
+											<div class="col-sm-7">
+												{{ form.nightlevel(class_="form-control" , type="number", value="0") }}
+												<br>
+												<input type="text" id="{{ form.nightlevel.id }}_slider">
+											</div>
+										</div>
+									</form>
+								</div>
+								<div class="box-footer">
+									<div class="text-center">
+										<button type="submit" class="btn btn-default" form="addroomform">Add</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+			</div>
+		</div>
+		
+		{% include '_modalconfirm.html' %}
+		
+		<div id="editroomform_modal" class="modal fade" role="dialog">
+			<div class="modal-dialog modal-sm">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Edit Room</h4>
+					</div>
+					<div class="modal-body">
+						<div id="editroomform_loading">
+							<i class="fa fa-circle-o-notch fa-spin"></i> Loading...
+						</div>
+						
+						<form action="{{ url_for('settings.configuration') }}edit" method="post" class="form-horizontal" id="editroomform" autocomplete="off" spellcheck="false">
+							{{ form.csrf_token }}
+							
+							<div class="form-group">
+								<label for="{{ form.topic.id }}" class="col-sm-5 control-label">{{ form.topic.label }}:</label>
+
+								<div class="col-sm-7">
+									{{ form.topic(class_="form-control" , placeholder="Topic", readonly=True) }}
+								</div>
+							</div>
+							
+							<div class="form-group">
+								<label for="{{ form.displayname.id }}" class="col-sm-5 control-label">{{ form.displayname.label }}:</label>
+
+								<div class="col-sm-7">
+									{{ form.displayname(class_="form-control" , placeholder="Display Name") }}
+								</div>
+							</div>
+							
+							<hr>
+							
+							<div class="form-group">
+								<label for="{{ form.nightlevel.id }}" class="col-sm-5 control-label">{{ form.nightlevel.label }}:</label>
+
+								<div class="col-sm-7">
+									{{ form.nightlevel(class_="form-control" , type="number", value="0") }}
+									<br>
+									<input type="text" id="{{ form.nightlevel.id }}_slider">
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<div class="text-center">
+							<button type="submit" class="btn btn-default" form="editroomform">Edit</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		{% include '_scripts.html' %}
+		
+		<script>
+			var addroomform;
+			var addroomform_nightlevel;
+			var addroomform_nightlevel_slider;
+			
+			var editroomform;
+			var editroomform_loading;
+			var editroomform_modal;
+			var editroomform_modal_footer;
+			var editroomform_topic;
+			var editroomform_displayname;
+			var editroomform_nightlevel;
+			var editroomform_nightlevel_slider;
+			
+			var sliderMoving = false;
+			
+			function editroomform_modal_open(e) {
+				var room = $(e).attr('data-edit-room');
+				
+				editroomform_loading.removeClass('hidden');
+				editroomform.addClass('hidden');
+				editroomform_modal_footer.addClass('hidden');
+				editroomform_modal.modal();
+				
+				editroomform[0].reset();
+				
+				$.getJSON('{{ url_for("settings.subscriptionjson") }}/' + room, function(result) {
+					result = result[0];
+					var topic = result.Topic;
+					var displayname = result.Displayname;
+					var nightlevel = result.Nightlevel;
+					
+					editroomform_topic.val(topic);
+					editroomform_displayname.val(displayname);
+					editroomform_nightlevel.val(nightlevel);
+					editroomform_nightlevel_slider.slider('setValue', nightlevel);
+					
+					editroomform_loading.addClass('hidden');
+					editroomform.removeClass('hidden');
+					editroomform_modal_footer.removeClass('hidden');
+				});
+			}
+			
+			function inputAndSlider(input,slider) {
+				var id = input.attr('id');
+				
+				slider.slider({
+					'id': id + '_slider',
+					'min': 0,
+					'max': 1024,
+					'step': 1,
+					'value': 0
+				});
+				
+				input.change(function() {
+					if (!sliderMoving) {
+						var value = $(this).val();
+						slider.slider('setValue', value);
+						$(this).val(slider.slider('getValue'));
+					}
+				});
+				
+				slider.change(function() {
+					sliderMoving = true;
+					
+					var value = $(this).val();
+					input.val(value);
+					
+					sliderMoving = false;
+				});
+			}
+			
+			$(document).ready(function () {
+				addroomform = $('#addroomform');
+				addroomform_nightlevel = addroomform.find('#nightlevel');
+				addroomform_nightlevel_slider = addroomform.find('#nightlevel_slider');
+				
+				editroomform = $('#editroomform');
+				editroomform_loading = $('#editroomform_loading');
+				editroomform_modal = $('#editroomform_modal');
+				editroomform_modal_footer = editroomform.find('.modal-footer');
+				editroomform_topic = editroomform.find('#topic');
+				editroomform_displayname = editroomform.find('#displayname');
+				editroomform_nightlevel = editroomform.find('#nightlevel');
+				editroomform_nightlevel_slider = editroomform.find('#nightlevel_slider');
+				
+				inputAndSlider(addroomform_nightlevel,addroomform_nightlevel_slider);
+				inputAndSlider(editroomform_nightlevel,editroomform_nightlevel_slider);
+			});
+		</script>
+		
+		<script>
+			var rooms_table;
+			
+			$(document).ready(function () {
+				rooms_table = $('#rooms_table');
+				
+				rooms_table.bootstrapTable({
+					url: '{{ url_for("settings.subscriptionjson") }}',
+					showRefresh: true,
+					search: true,
+					pagination: true,
+					responseHandler: function(res) {
+						var arr = [];
+						
+						for (i = 0; i < res.length; i++) {
+							var r = res[i];
+							var topic = r.Topic;
+							var timestamp = r.Timestamp;
+							var displayname = r.Displayname;
+							var nightlevel = r.Nightlevel;
+							
+							timestamp = formatDate(utcTimestampToDate(timestamp));
+							
+							var deleteurl = '{{ url_for("settings.deletesubscription") }}/' + topic;
+							var delete_button = '<button type="button" class="btn btn-link btn-sm color-red" data-confirm-id="' + topic + '" data-confirm-name="' + displayname + '" data-confirm-url="' + deleteurl + '" onclick="showConfirmModal(this)"><span class="glyphicon glyphicon-remove-circle"></span></button>';
+							
+							var actions = '<button type="button" class="btn btn-default btn-sm" data-edit-room="' + topic + '" onclick="editroomform_modal_open(this)"><span class="glyphicon glyphicon-edit"></span> Edit</button>'
+							
+							d = {
+								'1': delete_button,
+								'2': timestamp,
+								'3': topic,
+								'4': displayname,
+								'5': nightlevel,
+								'6': actions
+							}
+							
+							arr.push(d);
+						}
+						
+						return arr;
+					},
+					columns: [{
+						field: '1',
+						title: '<i class="fa fa-trash-o" aria-hidden="true"></i>',
+						align: 'center'
+					}, {
+						field: '2',
+						title: 'Added on',
+						sortable: true,
+						width: '30%'
+					}, {
+						field: '3',
+						title: 'Topic',
+						sortable: true,
+						width: '35%'
+					}, {
+						field: '4',
+						title: 'Displayname',
+						sortable: true,
+						width: '35%'
+					}, {
+						field: '5',
+						title: 'Night Level'
+					}, {
+						field: '6',
+						title: 'Actions',
+						align: 'center'
+					}],
+					data: []
+				});
+			});
+		</script>
+	</body>
+</html>

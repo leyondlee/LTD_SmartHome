@@ -1,0 +1,34 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "Stmt1502635912000",
+            "Effect": "Allow",
+            "Action": [
+                "dynamodb:CreateTable",
+                "dynamodb:DeleteItem",
+                "dynamodb:DeleteTable",
+                "dynamodb:Query"
+            ],
+            "Resource": [
+                "arn:aws:dynamodb:<region>:<account ID>:table/Sensor"
+            ]
+        },
+        {
+            "Sid": "Stmt1502636185000",
+            "Effect": "Allow",
+            "Action": [
+                "dynamodb:CreateTable",
+                "dynamodb:DeleteItem",
+                "dynamodb:DeleteTable",
+                "dynamodb:PutItem",
+                "dynamodb:Query",
+                "dynamodb:Scan",
+                "dynamodb:UpdateItem"
+            ],
+            "Resource": [
+                "arn:aws:dynamodb:<region>:<account ID>:table/Subscription"
+            ]
+        }
+    ]
+}

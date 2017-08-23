@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html>
+	{% include '_header.html' %}
+	
+	<body class="hold-transition skin-blue sidebar-mini">
+		<div class="wrapper">
+			{% include '_navbar.html' %}
+			
+			<div class="content-wrapper">
+				<section class="content-header">
+					<h1>
+						<i class="fa fa-dashboard" aria-hidden="true"></i> Dashboard
+					</h1>
+				</section>
+				
+				<section class="content">
+					<div class="row">
+						<div class="col-md-4">
+							<div class="info-box bg-navy">
+								<span class="info-box-icon"><i class="fa fa-bed" aria-hidden="true"></i></span>
+
+								<div class="info-box-content">
+									<span class="info-box-text">Monitoring</span>
+									<span class="info-box-number">
+										<span id="monitoring"><i class="fa fa-circle-o-notch fa-spin"></i> Loading</span>
+									</span>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-4">
+							<div class="info-box bg-green">
+								<span class="info-box-icon"><i class="fa fa-refresh" aria-hidden="true"></i></span>
+
+								<div class="info-box-content">
+									<span class="info-box-text">Last Refresh</span>
+									<span class="info-box-number">
+										<span id="lastrefresh"><i class="fa fa-circle-o-notch fa-spin"></i> Loading</span>
+									</span>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-4">
+							<div class="info-box bg-blue">
+								<span class="info-box-icon"><i class="fa fa-clock-o" aria-hidden="true"></i></span>
+
+								<div class="info-box-content">
+									<span class="info-box-text">Refresh Rate (Chart)</span>
+									<span class="info-box-number">
+										<span>
+											<select class="form-control" id="refreshrate">
+												<option value="0">Disabled</option>
+												<option value="1">5s</option>
+												<option value="2">10s</option>
+												<option value="3" selected>30s</option>
+												<option value="4">60s</option>
+											</select>
+										</span>
+									</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					<div class="row">
+						{% for key,value in rooms.iteritems() %}
+						<div class="col-md-12" id="room_{{ key }}_box">
+							<div class="box box-primary">
+								<div class="box-header with-border">
+									<h3 class="box-title">
+										<i class="fa fa-bed" aria-hidden="true"></i> {{ value.name }}
+									</h3>
+
+									<div class="box-tools pull-right">
+										<button type="button" class="btn btn btn-box-tool playbtn" disabled><i class="fa fa-volume-up" aria-hidden="true"></i></button>
+										<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+									</div>
+								</div>
+								<div class="box-body">
+									<div class="alert alert-danger error hidden">
+										<h4><i class="icon fa fa-warning"></i> Error</h4>
+										Something went wrong.
+									</div>
+									
+									<div class="col-md-3">
+										<div class="info-box bg-whitesmoke">
+											<span class="info-box-icon bg-red"><i class="fa fa-thermometer-half" aria-hidden="true"></i></span>
+
+											<div class="info-box-content">
+												<span class="info-box-text">Temperature</span>
+												<span class="info-box-number">
+													<span class="temperature"><i class="fa fa-circle-o-notch fa-spin"></i> Loading</span>
+												</span>
+											</div>
+										</div>
+									</div>
+									<div class="col-md-3">
+										<div class="info-box bg-whitesmoke">
+											<span class="info-box-icon bg-blue"><i class="fa fa-tint" aria-hidden="true"></i></span>
+
+											<div class="info-box-content">
+												<span class="info-box-text">Humidity</span>
+												<span class="info-box-number">
+													<span class="humidity"><i class="fa fa-circle-o-notch fa-spin"></i> Loading</span>
+												</span>
+											</div>
+										</div>
+									</div>
+									<div class="col-md-3">
+										<div class="info-box bg-whitesmoke">
+											<span class="info-box-icon bg-yellow"><i class="fa fa-sun-o" aria-hidden="true"></i></span>
+
+											<div class="info-box-content">
+												<span class="info-box-text">Light Level</span>
+												<span class="info-box-number">
+													<span class="light"><i class="fa fa-circle-o-notch fa-spin"></i> Loading</span>
+												</span>
+											</div>
+										</div>
+									</div>
+									<div class="col-md-3">
+										<div class="info-box bg-whitesmoke">
+											<span class="info-box-icon bg-olive"><i class="fa fa-clock-o" aria-hidden="true"></i></span>
+
+											<div class="info-box-content">
+												<span class="info-box-text">Last Updated</span>
+												<span class="info-box-number">
+													<span class="timestamp"><i class="fa fa-circle-o-notch fa-spin"></i> Loading</span>
+												</span>
+											</div>
+										</div>
+									</div>
+									
+									<div class="col-md-12">
+										<div class="box box-solid box-primary">
+											<div class="box-header with-border">
+												<h3 class="box-title"><i class="fa fa-area-chart" aria-hidden="true"></i> History</h3>
+											</div>
+											<div class="box-body">
+												<div class="col-md-6">
+													{% with id=key+'_dht11' %}
+													{% include '_chartoptions.html'  %}
+													{% endwith %}
+													
+													<div id="chart_{{ key }}_dht11"></div>
+												</div>
+												<div class="col-md-6">
+													{% with id=key+'_ldr' %}
+													{% include '_chartoptions.html'  %}
+													{% endwith %}
+													
+													<div id="chart_{{ key }}_ldr"></div>
+												</div>
+											</div>
+											<div class="box-footer">
+												<div class="text-center">
+													<button type="button" class="btn btn-default" onclick="openTableModal('{{ key }}','{{ value.name }}')"><span class="glyphicon glyphicon-list-alt"></span>&nbsp;&nbsp;View Details</button>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						{% endfor %}
+					</div>
+				</section>
+			</div>
+		</div>
+		
+		<div id="table_modal" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title"></h4>
+					</div>
+					<div class="modal-body">
+						<div class="table-responsive">
+							<table class="table table-bordered table-hover" id="table"></table>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		{% include '_scripts.html' %}
+		
+		<script>
+			var table;
+			var table_modal;
+			var table_modal_title;
+			
+			function openTableModal(room, name) {
+				var title = "History for \"" + name + "\"";
+				table_modal_title.text(title);
+				
+				table.bootstrapTable('destroy', true);
+				
+				var url = '{{ url_for("main.index") }}history/' + room;
+				table.bootstrapTable({
+					url: url,
+					showRefresh: true,
+					search: true,
+					pagination: true,
+					responseHandler: function(res) {
+						var arr = [];
+						
+						for (i = 0; i < res.length; i++) {
+							r = res[i];
+							var count = i + 1;
+							var timestamp = r.Timestamp;
+							var temperature = r.Temperature;
+							var humidity = r.Humidity;
+							var light = r.Light;
+							
+							var datetime = formatDate(utcTimestampToDate(timestamp));
+							
+							d = {
+								'1': count,
+								'2': datetime,
+								'3': temperature,
+								'4': humidity,
+								'5': light
+							}
+							
+							arr.push(d);
+						}
+						
+						return arr;
+					},
+					columns: [{
+						field: '1',
+						title: '#',
+						sortable: 'true',
+						align: 'center'
+					}, {
+						field: '2',
+						title: 'Datetime',
+						sortable: 'true'
+					}, {
+						field: '3',
+						title: 'Temperature (&deg;C)',
+						sortable: 'true'
+					}, {
+						field: '4',
+						title: 'Humidity (%)',
+						sortable: 'true'
+					}, {
+						field: '5',
+						title: 'Light',
+						sortable: 'true'
+					}]
+				});
+				
+				table_modal.modal();
+				
+				initModalScroll(table_modal);
+			}
+			
+			$(document).ready(function() {
+				table = $('#table');
+				table_modal = $('#table_modal');
+				table_modal_title = table_modal.find('.modal-title');
+			});
+		</script>
+		
+		<script>
+			google.charts.load('current', {packages: ['corechart']});
+			
+			var rooms = [];
+			var monitoring;
+			var lastrefresh;
+			var refreshrate;
+			var refreshrate_timeout;
+			var socket;
+			var socketid;
+			
+			function getTimeoutInterval(num) {
+				var timeout;
+				
+				if (num == 1) {
+					timeout = 5000;
+				} else if (num == 2) {
+					timeout = 10000;
+				} else if (num == 3) {
+					timeout = 30000;
+				} else if (num == 4) {
+					timeout = 60000;
+				}
+				
+				return timeout;
+			}
+			
+			function getTimeoutDisplay(num) {
+				var string;
+				
+				if (num == 1) {
+					string = '5s';
+				} else if (num == 2) {
+					string = '10s';
+				} else if (num == 3) {
+					string = '30s';
+				} else if (num == 4) {
+					string = '60s';
+				} else {
+					string = 'Disabled'
+				}
+				
+				return string
+			}
+			
+			function drawChart(id,result,options) {
+				var data = new google.visualization.DataTable(result);
+				var date_formatter = new google.visualization.DateFormat({ 
+					pattern: 'dd-MM-yy HH:mm:ss'
+				}); 
+				date_formatter.format(data, 0);
+				
+				var chart = new google.visualization.LineChart(document.getElementById(id));
+				chart.draw(data, options);
+			}
+			
+			function updateChart(room,type) {
+				var chart;
+				var zoom;
+				var url;
+				var columns;
+				var options = {
+					height: 300,
+					interpolateNulls: true,
+					chartArea: {'width': '80%'},
+					hAxis: {
+						title: 'Timestamp'
+					},
+					vAxis: {
+						title: 'Value',
+						viewWindow: {
+							min: 0
+						},
+						viewWindowMode: 'pretty'
+					},
+					series: {
+						1: {curveType: 'function'}
+					},
+					explorer: {
+						keepInBounds: true,
+						axis: 'horizontal',
+						maxZoomIn: 0,
+						maxZoomOut: 1
+					},
+					legend: {position: 'none'}
+				};
+				
+				if (type == 1 || type == 'dht11') {
+					chart = 'chart_' + room + '_dht11';
+					zoom = $('#chart_' + room + '_dht11_zoom');
+					
+					url = '{{ url_for("main.index") }}history/' + room + '/dht11/' + zoom.val();
+					
+					columns = [
+						{'id': 'Timestamp', 'label': 'Timestamp', 'type': 'datetime'},
+						{'id': 'Humidity', 'label': 'Humidity', 'type': 'number'},
+						{'id': 'Temperature', 'label': 'Temperature', 'type': 'number'}
+					];
+					
+					options['title'] = 'DHT11';
+					options['series'] = {
+						0: { color: 'blue' },
+						1: { color: 'red' }
+					};
+				} else if (type == 2 || type == 'ldr') {
+					chart = 'chart_' + room + '_ldr';
+					zoom = $('#chart_' + room + '_ldr_zoom');
+					
+					url = '{{ url_for("main.index") }}history/' + room + '/ldr/' + zoom.val()
+					
+					columns = [
+						{'id': 'Timestamp', 'label': 'Timestamp', 'type': 'datetime'},
+						{'id': 'Light', 'label': 'Light Level', 'type': 'number'}
+					]
+					
+					options['title'] = 'LDR';
+					options['series'] = {
+						0: { color: 'orange' }
+					};
+				}
+				
+				if (url) {
+					$.getJSON(url, function(result) {
+						var rows = [];
+						
+						if (result) {
+							for (var i = 0; i < result.length; i++) {
+								var r = result[i];
+								var c = [];
+								
+								for (var k = 0; k < columns.length; k++) {
+									var col = columns[k]
+									var id = col['id'];
+									var type = col['type'];
+									
+									if (id in r) {
+										var v = r[id];
+										
+										if (type == 'datetime') {
+											v = utcTimestampToDate(v);
+										}
+										
+										c.push({'v': v});
+									}
+								}
+								
+								rows.push({'c': c});
+							}
+						}
+						
+						var data = {
+							'cols': columns,
+							'rows': rows
+						};
+						
+						google.charts.setOnLoadCallback(function() {
+							drawChart(chart,data,options);
+						});
+					});
+				}
+			}
+			
+			function playAudio(room) {
+				var box = $('#room_' + room + '_box');
+				var playbtn = box.find('.playbtn');
+				
+				var audio = document.createElement('audio');
+				audio.setAttribute('src', '{{ url_for("main.audio") }}/' + room);
+				
+				if (audio.canPlayType('audio/wav')) {
+					playbtn.prop('disabled',true);
+					
+					audio.addEventListener('ended', function() {
+						this.remove();
+						playbtn.prop('disabled',false);
+					});
+					
+					audio.addEventListener('error', function() {
+						this.remove();
+						playbtn.prop('disabled',false);
+					});
+					
+					audio.addEventListener("canplay",function() {
+						this.play();
+					});
+				}
+			}
+			
+			function refreshCharts() {
+				if (refreshrate_timeout) {
+					clearTimeout(refreshrate_timeout);
+				}
+				
+				for (i = 0; i < rooms.length; i++) {
+					var room = rooms[i];
+					
+					updateChart(room,1);
+					updateChart(room,2);
+				}
+				
+				var date = formatDate(new Date());
+				lastrefresh.text(date);
+				
+				var refreshrate_value = refreshrate.val();
+				var timeout = getTimeoutInterval(refreshrate_value);
+	
+				if (timeout) {
+					refreshrate_timeout = setTimeout(refreshCharts,timeout);
+				}
+			}
+			
+			function chartZoom(room,type) {
+				if (type == 1) {
+					type = 'dht11';
+				} else if (type == 2) {
+					type = 'ldr';
+				} else {
+					type = null;
+				}
+				
+				if (type) {
+					var zoom = $('#chart_' + room + '_' + type + '_zoom');
+					
+					var zoom_cookie = Cookies.get('zoom');
+					if (zoom_cookie) {
+						zoom_cookie = JSON.parse(zoom_cookie);
+						if (room in zoom_cookie && type in zoom_cookie[room]) {
+							zoom.val(zoom_cookie[room][type]);
+						}
+					}
+					
+					zoom.attr('room',room);
+					zoom.attr('type',type);
+					zoom.on('change', function() {
+						var room = $(this).attr('room');
+						var type = $(this).attr('type');
+						var value = this.value;
+						
+						var zoom_cookie = Cookies.get('zoom');
+						if (zoom_cookie) {
+							zoom_cookie = JSON.parse(zoom_cookie);
+							if (!(room in zoom_cookie)) {
+								zoom_cookie[room] = {};
+							}
+						} else {
+							zoom_cookie = {};
+							zoom_cookie[room] = {};
+						}
+						
+						zoom_cookie[room][type] = value;
+						
+						Cookies.set('zoom', JSON.stringify(zoom_cookie));
+						updateChart(room,type);
+					});
+				}
+			}
+			
+			function setupRoom(room) {
+				var box = $('#room_' + room + '_box');
+				var playbtn = box.find('.playbtn');
+				var error_alert = box.find('.error');
+				var temperature = box.find('.temperature');
+				var humidity = box.find('.humidity');
+				var light = box.find('.light');
+				var timestamp = box.find('.timestamp');
+				
+				socket.on(room, function(msg) {
+					var time = msg.Timestamp;
+					var h = msg.Humidity;
+					var t = msg.Temperature;
+					var l = msg.Light;
+					
+					if (time) {
+						time = utcTimestampToDate(time);
+						time = formatDate(time);
+						time = time.split(' ');
+						time = time.join('<br>');
+						timestamp.html(time);
+					} else {
+						timestamp.html('<span class="label label-default">Null</span>');
+					}
+						
+					if (t) {
+						temperature.html(t + '&deg;C');
+					} else {
+						temperature.html('<span class="label label-default">Null</span>');
+					}
+					
+					if (h) {
+						humidity.html(h + '%');
+					} else {
+						humidity.html('<span class="label label-default">Null</span>');
+					}
+					
+					if (l) {
+						l = Math.round((1024 / l) % 1024);
+						light.html(l);
+					} else {
+						light.html('<span class="label label-default">Null</span>');
+					}
+					
+					playbtn.prop('disabled',false);
+				});
+				
+				playbtn.off('click');
+				playbtn.click(function() {
+					playAudio(room);
+				});
+			}
+			
+			$(document).ready(function() {
+				socket = socketConnect();
+				
+				monitoring = $('#monitoring');
+				lastrefresh = $('#lastrefresh');
+				refreshrate = $('#refreshrate');
+				
+				var refreshrate_value = Cookies.get('refreshrate');
+				if (refreshrate_value) {
+					refreshrate.val(refreshrate_value);
+				}
+				
+				refreshrate.on('change', function() {
+					refreshCharts();
+					Cookies.set('refreshrate', this.value);
+				});
+				
+				{% for key,value in rooms.iteritems() %}
+				rooms.push('{{ key }}');
+				{% endfor %}
+				
+				for (var i = 0; i < rooms.length; i++) {
+					var room = rooms[i];
+					setupRoom(room);
+					chartZoom(room,1);
+					chartZoom(room,2);
+				}
+				
+				monitoring.text(rooms.length + ' Room(s)');
+				refreshCharts(rooms);
+				
+				$('#sidebar-toggle').on('click', function(e) {
+					setTimeout(function() {
+						refreshCharts(rooms);
+					},1000);
+				});
+				
+				socket.on('connect', () => {
+					socket.emit('join', {room: 'sensors'});
+					socketid = socket.io.engine.id;
+					
+					for (var i = 0; i < rooms.length; i++) {
+						var room = rooms[i];
+						$.ajax({url: '{{ url_for("main.roomemit") }}/' + room + '/' + socketid});
+					}
+				});
+			});
+		</script>
+	</body>
+</html>
