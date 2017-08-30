@@ -1,16 +1,23 @@
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
-from gpiozero import PWMLED
 import ConfigParser
+import os
 
 __GETCONFIGMAIN_ERROR__ = '''
 	[Main]
 	Missing field(s) or wrong type.
 	Fields must be as follows:
 		> topic - STRING
-		> dht11_pin - INTEGER
-		> motionsensor_pin - INTEGER
-		> ldr_channel - INTEGER
-		> led_pins - STRING (Seperated by ,)
+		> button_pin - INTEGER
+'''
+
+__GETCONFIGGOOGLE_ERROR__ = '''
+	[AWS]
+	Missing field(s) or wrong type.
+	Fields must be as follows:
+		> aws_endpoint - STRING
+		> aws_rootcapath - STRING
+		> aws_certificatepath - STRING
+		> aws_privatekeypath - STRING
 '''
 
 __GETCONFIGAWS_ERROR__ = '''
@@ -45,13 +52,23 @@ def getConfigMain():
 	try:
 		dict = dict['Main']
 		results['topic'] = dict['topic']
-		results['dht11_pin'] = int(dict['dht11_pin'])
-		results['motionsensor_pin'] = int(dict['motionsensor_pin'])
-		results['ldr_channel'] = int(dict['ldr_channel'])
-		results['led_pins'] = [int(i) for i in dict['led_pins'].split(',')]
+		results['button_pin'] = int(dict['button_pin'])
 	except:
 		print('Exception: {}'.format(e))
 		raise ValueError(__GETCONFIGMAIN_ERROR__)
+			
+	return results
+	
+def getConfigGoogle():
+	results = {}
+	
+	dict = getConfig()
+	try:
+		dict = dict['Google']
+		results['application_credentials_file'] = dict['application_credentials_file']
+	except:
+		print('Exception: {}'.format(e))
+		raise ValueError(__GETCONFIGGOOGLE_ERROR__)
 			
 	return results
 	
@@ -70,20 +87,6 @@ def getConfigAWS():
 		raise ValueError(__GETCONFIGAWS_ERROR__)
 			
 	return results
-
-def getLEDs(pins):
-	leds = {}
-	
-	for pin in pins:
-		try:
-			leds[pin] = {
-				'LED': PWMLED(pin),
-				'Overwrite': False
-			}
-		except:
-			pass
-		
-	return leds
 	
 def getMQTTClient(name=''):
 	mqttClient = None
@@ -111,3 +114,7 @@ def getMQTTClient(name=''):
 			''')
 	
 	return mqttClient
+	
+def deleteFile(filename):
+	if os.path.isfile(filename):
+		os.remove(filename)

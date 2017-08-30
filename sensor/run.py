@@ -60,8 +60,11 @@ def publish():
 	}
 	
 	led_dict = {}
-	for key,value in leds.iteritems():
-		led_dict[key] = value.value
+	for pin,dict in leds.iteritems():
+		led_dict[pin] = {
+			'Value': dict['LED'].value,
+			'Overwrite': dict['Overwrite']
+		}
 	
 	controls = {
 		'LEDs': led_dict,
@@ -84,14 +87,24 @@ def mqttCallback(client, userdata, message):
 		subtype = parts[3]
 		param = parts[4]
 		
+		valid = True
 		if subtype == 'led':
-			param = int(param)
 			value = payload['Value']
+			overwrite = payload['Overwrite']
 			
-			if 0 <= value <= 1:
-				if param in leds:
-					led = leds[param]
-					led.value = value
+			if param == 'all':
+				if 0 <= value <= 1:
+					for key,dict in leds.iteritems():
+						dict['LED'].value = value
+						dict['Overwrite'] = overwrite
+			else:
+				param = int(param)
+				
+				if 0 <= value <= 1:
+					if param in leds:
+						led = leds[param]
+						led['LED'].value = value
+						led['Overwrite'] = overwrite
 		elif subtype == 'process':
 			value = payload['Value']
 			
@@ -105,7 +118,12 @@ def mqttCallback(client, userdata, message):
 					ldr_monitor.resume()
 				else:
 					ldr_monitor.pause()
-					
+		else:
+			valid = False
+		
+		if valid:
+			publish()
+		
 def motion_detected():
 	global mqttClient, motion_topic
 	

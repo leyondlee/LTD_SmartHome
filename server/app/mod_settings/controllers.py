@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 from app.mod_settings.forms import AddRoomForm
-from app.common import getSubscription
+from app.common import getSubscription, DeleteSensorTopic
 from app.dynamodblib import DecimalEncoder, query, scan, putItem, deleteItem, updateItem
 from app.mqttlib import roomSubscribe, roomUnsubscribe
 from boto3.dynamodb.conditions import Key
@@ -57,7 +57,10 @@ def configuration(action):
 					':n': Decimal(nightlevel)
 				}
 				r = updateItem('Subscription',key,updateExpression,expressionAttributeValues)
-				if r:
+				rooms = app.rooms
+				if r and topic in rooms:
+					rpi = rooms[topic]
+					rpi.name = displayname
 					success = 'Room edited.'
 				else:
 					error = 'Unable to edit subscription.'
@@ -86,18 +89,10 @@ def deletesubscription(topic):
 			r = deleteItem('Subscription',key)
 			if r:
 				roomUnsubscribe(topic)
-				condition = Key('Room').eq(topic)
-				columns = '#timestamp'
-				expressions = {'#timestamp':'Timestamp'}
-				results = query('Sensor',condition,columns,expressions)
-				for r in results:
-					key = {
-						'Room': topic,
-						'Timestamp': r['Timestamp']
-					}
-					deleteItem('Sensor',key)
+				deleteSensorTopic = DeleteSensorTopic(topic)
+				deleteSensorTopic.start()
 		
-	return redirect(url_for('settings.configuration'))
+	return ('',204)
 	
 @mod_settings.route('/subscription/json', defaults={'room': None})
 @mod_settings.route('/subscription/json/<room>')

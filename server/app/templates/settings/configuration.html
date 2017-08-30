@@ -290,7 +290,7 @@
 							timestamp = formatDate(utcTimestampToDate(timestamp));
 							
 							var deleteurl = '{{ url_for("settings.deletesubscription") }}/' + topic;
-							var delete_button = '<button type="button" class="btn btn-link btn-sm color-red" data-confirm-id="' + topic + '" data-confirm-name="' + displayname + '" data-confirm-url="' + deleteurl + '" onclick="showConfirmModal(this)"><span class="glyphicon glyphicon-remove-circle"></span></button>';
+							var delete_button = '<button type="button" class="btn btn-link btn-sm color-red" data-confirm-id="' + topic + '" data-confirm-name="' + displayname + '" data-confirm-url="' + deleteurl + '" data-confirm-table="rooms_table" onclick="showConfirmModal(this,true)"><span class="glyphicon glyphicon-remove-circle"></span></button>';
 							
 							var actions = '<button type="button" class="btn btn-default btn-sm" data-edit-room="' + topic + '" onclick="editroomform_modal_open(this)"><span class="glyphicon glyphicon-edit"></span> Edit</button>'
 							

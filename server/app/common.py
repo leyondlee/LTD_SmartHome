@@ -3,7 +3,7 @@ from watson_developer_cloud import VisualRecognitionV3, TextToSpeechV1
 from dateutil.relativedelta import relativedelta
 from dateutil import tz
 from datetime import datetime
-from app.dynamodblib import createTable, query
+from app.dynamodblib import createTable, query, deleteItem
 import ConfigParser
 import os
 import app
@@ -11,6 +11,7 @@ import ssl
 import urllib2
 import calendar
 import json
+import gevent
 
 __GETCONFIGMAIN_ERROR__ = '''
 	[Main]
@@ -38,9 +39,9 @@ __GETCONFIGAWS_ERROR__ = '''
 		> aws_iot_rootcapath - STRING
 		> aws_iot_certificatepath - STRING
 		> aws_iot_privatekeypath - STRING
-		> aws_dynamodb_access_key_id - STRING
-		> aws_dynamodb_secret_access_key - STRING
-		> aws_dynamodb_region_name - STRING
+		> aws_webapp_access_key_id - STRING
+		> aws_webapp_secret_access_key - STRING
+		> aws_webapp_region_name - STRING
 '''
 
 __GETCONFIGIBM_ERROR__ = '''
@@ -73,6 +74,26 @@ Fields must be as follows:
 	> privatekeypath - STRING
 	> privatekeypassword - STRING
 '''
+
+class DeleteSensorTopic(gevent.Greenlet):
+	def __init__(self,topic):
+		gevent.Greenlet.__init__(self)
+		self.topic = topic
+		
+	def _run(self):
+		topic = self.topic
+		
+		condition = Key('Room').eq(topic)
+		columns = '#timestamp'
+		expressions = {'#timestamp':'Timestamp'}
+		results = query('Sensor',condition,columns,expressions)
+		for r in results:
+			key = {
+				'Room': topic,
+				'Timestamp': r['Timestamp']
+			}
+			deleteItem('Sensor',key)
+			gevent.sleep(0)
 
 def login_exempt(f):
     f.login_exempt = True
@@ -162,9 +183,9 @@ def getConfigAWS():
 		results['aws_iot_rootcapath'] = dict['aws_iot_rootcapath']
 		results['aws_iot_certificatepath'] = dict['aws_iot_certificatepath']
 		results['aws_iot_privatekeypath'] = dict['aws_iot_privatekeypath']
-		results['aws_dynamodb_access_key_id'] = dict['aws_dynamodb_access_key_id']
-		results['aws_dynamodb_secret_access_key'] = dict['aws_dynamodb_secret_access_key']
-		results['aws_dynamodb_region_name'] = dict['aws_dynamodb_region_name']
+		results['aws_webapp_access_key_id'] = dict['aws_webapp_access_key_id']
+		results['aws_webapp_secret_access_key'] = dict['aws_webapp_secret_access_key']
+		results['aws_webapp_region_name'] = dict['aws_webapp_region_name']
 	except Exception as e:
 		print('Exception: {}'.format(e))
 		raise ValueError(__GETCONFIGAWS_ERROR__)
@@ -293,6 +314,7 @@ def timestampToLocal(t):
 	
 def textToSpeech(message):
 	result = None
+	
 	if message:
 		ibm_config = getConfigIBM()
 		username = ibm_config['ibm_texttospeech_username']

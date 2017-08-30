@@ -64,9 +64,9 @@ import json
 __AWSCONFIG__ = getConfigAWS()
 dynamodb = boto3.resource(
 	'dynamodb',
-	aws_access_key_id=__AWSCONFIG__['aws_dynamodb_access_key_id'],
-    aws_secret_access_key=__AWSCONFIG__['aws_dynamodb_secret_access_key'],
-	region_name=__AWSCONFIG__['aws_dynamodb_region_name']
+	aws_access_key_id=__AWSCONFIG__['aws_webapp_access_key_id'],
+    aws_secret_access_key=__AWSCONFIG__['aws_webapp_secret_access_key'],
+	region_name=__AWSCONFIG__['aws_webapp_region_name']
 )
 
 createSensorTable()

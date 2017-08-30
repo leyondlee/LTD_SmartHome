@@ -1,0 +1,3 @@
+AWSIoTPythonSDK
+gpiozero
+google-cloud-speech

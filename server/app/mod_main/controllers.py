@@ -81,8 +81,11 @@ def audio(room):
 		message = ' '.join(messages)
 		
 		audio = textToSpeech(message)
-		response = make_response(audio)
-		response.headers['Content-Type'] = 'audio/wav'
+		if audio:
+			response = make_response(audio)
+			response.headers['Content-Type'] = 'audio/wav'
+		else:
+			response = ('',503)
 	else:
 		response = ('',404)
 		

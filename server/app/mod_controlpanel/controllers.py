@@ -58,14 +58,7 @@ def roomemit(room,socketid):
 @mod_controlpanel.route('/room/<room>/led/<int:pin>/set/mode/<int:value>')
 def setLEDmode(room,pin,value):
 	value = value == 1
-	
-	rooms = app.rooms
-	if room in rooms:
-		rpi = rooms[room]
-		leds = rpi.leds
-		pin = str(pin)
-		if leds and pin in leds:
-			leds[pin]['Overwrite'] = value
+	setLEDValue(room,pin,None,value)
 	
 	return ('',204)
 
@@ -98,12 +91,19 @@ def visualrecognition(id):
 		results = doVisualRecognition(filename)
 		deleteFile(filename)
 		
-		classes = results['images'][0]['classifiers'][0]['classes']
+		classes = None
+		try:
+			classes = results['images'][0]['classifiers'][0]['classes']
+		except:
+			pass
 		
-		image.results = json.dumps(classes)
-		image.save()
+		if classes:
+			image.results = json.dumps(classes)
+			image.save()
 	
-		response = ('',204)
+			response = ('',204)
+		else:
+			response = ('',503)
 	else:
 		response = ('',404)
 	

@@ -38,10 +38,10 @@ class RPI:
 			self.ldr_monitor = payload['LDR_Monitor']
 			
 			leds = {}
-			for pin,value in payload['LEDs'].iteritems():
+			for pin,dict in payload['LEDs'].iteritems():
 				leds[pin] = {
-					'Value': value,
-					'Overwrite': self.isOverwriteLED(pin)
+					'Value': dict['Value'],
+					'Overwrite': dict['Overwrite']
 				}
 				
 			self.leds = leds

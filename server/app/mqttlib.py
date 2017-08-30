@@ -57,16 +57,17 @@ def mqttCallback(client, userdata, message):
 				light = rpi.light
 				if light:
 					subscription = getSubscription(rpi.topic)
-					nightlevel = subscription['Nightlevel']
-					leds = rpi.leds
-					if leds:
-						lastmotion = rpi.lastmotion
-						if convertLight(light) > nightlevel or not lastmotion or lastmotion < datetimeToTimestamp(datetime.datetime.now() - datetime.timedelta(seconds=30)):
-							for pin,d in leds.iteritems():
-								value = d['Value']
-								overwrite = d['Overwrite']
-								if value != 0 and not overwrite:
-									setLEDValue(room,pin,0)
+					if subscription:
+						nightlevel = subscription['Nightlevel']
+						leds = rpi.leds
+						if leds:
+							lastmotion = rpi.lastmotion
+							if convertLight(light) > nightlevel or not lastmotion or lastmotion < datetimeToTimestamp(datetime.datetime.now() - datetime.timedelta(seconds=30)):
+								for pin,d in leds.iteritems():
+									value = d['Value']
+									overwrite = d['Overwrite']
+									if value != 0 and not overwrite:
+										setLEDValue(room,pin,0)
 			elif type == 'controls':
 				rpi.setControlsData(payload)
 				socketio.emit(room,rpi.getControlsData(),room='controls')
@@ -112,7 +113,7 @@ def roomUnsubscribe(topic):
 	
 	app.rooms.pop(topicname,None)
 	
-def setLEDValue(room,pin,value,overwrite=False):
+def setLEDValue(room,pin,value=None,overwrite=False):
 	rooms = app.rooms
 	mqttClient = app.mqttClient
 	
@@ -122,12 +123,16 @@ def setLEDValue(room,pin,value,overwrite=False):
 		pin = str(pin)
 		
 		if leds and pin in leds:
-			leds[pin]['Value'] = value
+			if value is None:
+				value = leds[pin]['Value']
+			else:
+				leds[pin]['Value'] = value
 			leds[pin]['Overwrite'] = overwrite
 			
 			topic = 'room/{}/controls/led/{}'.format(room,pin)
 			data = {
-				'Value': value
+				'Value': value,
+				'Overwrite': overwrite
 			}
 			mqttClient.publish(topic,json.dumps(data),1)
 			
