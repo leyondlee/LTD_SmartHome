@@ -65,14 +65,14 @@ __GETCONFIGCAMERA_ERROR__ = '''
 '''
 
 __GETCONFIGSERVER_ERROR__ = '''
-[Server]
-Missing field(s) or wrong type.
-Fields must be as follows:
-	> server_port - INTEGER
-	> rootcapath - STRING
-	> certificatepath - STRING
-	> privatekeypath - STRING
-	> privatekeypassword - STRING
+	[Server]
+	Missing field(s) or wrong type.
+	Fields must be as follows:
+		> server_port - INTEGER
+		> rootcapath - STRING
+		> certificatepath - STRING
+		> privatekeypath - STRING
+		> privatekeypassword - STRING
 '''
 
 class DeleteSensorTopic(gevent.Greenlet):

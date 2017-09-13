@@ -1,26 +1,26 @@
 import ConfigParser
 
 __GETCONFIGSERVER_ERROR__ = '''
-[Server]
-Missing field(s) or wrong type.
-Fields must be as follows:
-	> server_port - INTEGER
-	> main_host - STRING
-	> rootcapath - STRING
-	> certificatepath - STRING
-	> privatekeypath - STRING
-	> privatekeypassword - STRING
+	[Server]
+	Missing field(s) or wrong type.
+	Fields must be as follows:
+		> server_port - INTEGER
+		> main_host - STRING
+		> rootcapath - STRING
+		> certificatepath - STRING
+		> privatekeypath - STRING
+		> privatekeypassword - STRING
 '''
 
 __GETCONFIGCAMERA_ERROR__ = '''
-[Camera]
-Missing field(s) or wrong type.
-Fields must be as follows:
-	> stream_port - INTEGER
-	> stream_rootcapath - STRING
-	> stream_certificatepath - STRING
-	> stream_privatekeypath - STRING
-	> stream_privatekeypassword - STRING
+	[Camera]
+	Missing field(s) or wrong type.
+	Fields must be as follows:
+		> stream_port - INTEGER
+		> stream_rootcapath - STRING
+		> stream_certificatepath - STRING
+		> stream_privatekeypath - STRING
+		> stream_privatekeypassword - STRING
 '''
 
 def getConfig():
