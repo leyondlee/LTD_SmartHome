@@ -1,4 +1,4 @@
-# LTD_SmartHome
-A Smart Home Project.
+# LTD Smart Home
+LTD Smart Home a Smart Home IoT project that provides real-time temperature, humidity, and light level monitoring through the use of DHT11 Sensors and Light Dependent Resistors. it also provides LED light controls and LEDs also can be configured to be automatically turned on when the light level of the particular room is below a certain level and when a motion is detected. Additionally, a PiCamera can be configured for streaming and to take a picture whenever the doorbell is pressed. Lastly, LTD Smart Home provides user authentication and management. Users can also change their own passwords and generate their own unique API key. The API key can be used to access information such as sensor data which will be outputted as JSON. With this, users can create their own applications to expand their “Smart Home” without the need to modify the actual source code.
 
-Tutorial - https://developer.ibm.com/recipes/tutorials/ltd-smart-home/
+Tutorial: [Link](Tutorial.pdf)
